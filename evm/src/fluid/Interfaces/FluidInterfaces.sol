@@ -1,7 +1,7 @@
-import { IFluidDexT1 } from ""./iDexT1.sol";
+import { IFluidDexT1 } from "./iDexT1.sol";
 import { Structs } from "./structs.sol";
 
-interface FluidDexReservesResolver {
+interface FluidDexReservesResolver is Structs{
     function getPoolAddress(uint256 poolId_) external view returns (address pool_);
     function getTotalPools() external view returns (uint);
     function getAllPoolAddresses() external view returns (address[] memory pools_);

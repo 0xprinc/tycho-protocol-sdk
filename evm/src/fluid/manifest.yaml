@@ -1,7 +1,7 @@
 # information about the author helps us reach out in case of issues.
 author:
-  name: shadowycoders.dev
-  email: hello@shadowycreators.com
+  name: 0xprinc                     // @todo
+  email: 0xprinc@gmail.com
 
 # Protocol Constants
 constants:
@@ -11,6 +11,7 @@ constants:
     - SellSide
     - BuySide
     - PriceFunction
+    - HardLimits
 
 # The file containing the adapter contract
 contract: EtherfiAdapter.sol
