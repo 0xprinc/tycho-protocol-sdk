@@ -124,6 +124,7 @@ contract FluidAdapter is ISwapAdapter {
 
         (address token0,) = resolver.getPoolTokens(poolAddress);
 
+        IERC20(sellToken).transferFrom(msg.sender, address(this), specifiedAmount);
         IERC20(sellToken).approve(poolAddress, specifiedAmount);
 
         if (side == OrderSide.Sell) {

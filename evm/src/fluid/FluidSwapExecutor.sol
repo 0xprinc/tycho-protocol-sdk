@@ -17,40 +17,6 @@ contract FluidSwapExecutor is ISwapExecutor {
         resolver = FluidDexReservesResolver(resolver_);
     }
 
-    /// @notice Internal function to get price at a specific point
-    /// @param poolId Pool identifier
-    /// @param sellToken Token being sold
-    /// @param buyToken Token being bought
-    /// @param givenAmount Amount of tokens
-    /// @param side Order side (sell or buy)
-    /// @return price Calculated price fraction
-    function getPriceAt(
-        bytes32 poolId,
-        address sellToken,
-        address buyToken,
-        uint256 givenAmount,
-        bool side   // true for sell and false for buy
-    ) internal returns (uint price) {
-        address poolAddress = resolver.getPoolAddress(uint256(poolId));
-        (address token0, address token1) = resolver.getPoolTokens(poolAddress);
-
-        if (side) {
-            price = resolver.estimateSwapIn(
-                    poolAddress,
-                    sellToken == token0,
-                    givenAmount,
-                    0
-                );
-        } else {
-            price = resolver.estimateSwapOut(
-                    poolAddress,
-                    sellToken == token0,
-                    givenAmount,
-                    type(uint256).max
-                );
-        }
-    }
-
     /**
      * @dev Executes a Balancer swap.
      * @param givenAmount how much of to swap, depending on exactOut either in-
@@ -77,6 +43,11 @@ contract FluidSwapExecutor is ISwapExecutor {
 
         (address token0,) = resolver.getPoolTokens(poolAddress);
 
+        if(sellToken != 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE){
+            IERC20(sellToken).transferFrom(msg.sender, address(this), givenAmount);
+            IERC20(sellToken).approve(poolAddress, givenAmount);
+        }
+
         if (side) {
             calculatedAmount = pool.swapIn{value: msg.value}(
                 sellToken == token0, givenAmount, 0, msg.sender
@@ -90,4 +61,6 @@ contract FluidSwapExecutor is ISwapExecutor {
             );
         }
     }
+
+    function receive() external payable {}
 }

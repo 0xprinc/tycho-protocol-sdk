@@ -5,6 +5,7 @@ import {AdapterTest} from "./AdapterTest.sol";
 import "forge-std/console.sol";
 import {IERC20} from "lib/forge-std/src/interfaces/IERC20.sol";
 import {FluidAdapter} from "src/fluid/FluidAdapter.sol";
+import {FluidSwapExecutor} from "src/fluid/FluidSwapExecutor.sol";
 import {ISwapAdapterTypes} from "src/interfaces/ISwapAdapterTypes.sol";
 import {FractionMath} from "src/libraries/FractionMath.sol";
 import {FluidDexReservesResolver} from "src/fluid/Interfaces/FluidInterfaces.sol";
@@ -15,6 +16,7 @@ contract FluidAdapterTest is AdapterTest {
     using FractionMath for Fraction;
 
     FluidAdapter adapter;
+    FluidSwapExecutor executor;
     FluidDexReservesResolver resolver;
     bytes32 poolId1;
     bytes32 poolId2;
@@ -36,6 +38,7 @@ contract FluidAdapterTest is AdapterTest {
         
         // Deploy FluidAdapter with mock resolver
         adapter = new FluidAdapter(address(resolver));
+        executor = new FluidSwapExecutor(address(resolver));
 
         poolId1 = bytes32(abi.encode(1)); // wstETH/Eth
         poolId2 = bytes32(abi.encode(2)); // USDC/USDT
@@ -80,16 +83,32 @@ contract FluidAdapterTest is AdapterTest {
         address testUser = makeAddr("testUser");
 
         vm.prank(0x37305B1cD40574E4C5Ce33f8e8306Be057fD7341);   // usdc whale
-        IERC20(pool2Token0).transfer(address(adapter), 1e10);
+        IERC20(pool2Token0).transfer(testUser, 1e10);
+
+        vm.startPrank(testUser);
+        IERC20(pool2Token0).approve(address(adapter), 1e6);
 
         Trade memory trade = adapter.swap(poolId2, pool2Token0, pool2Token1, OrderSide.Sell, 1e6);
         assert(trade.calculatedAmount == 999916);
 
-        vm.prank(0x37305B1cD40574E4C5Ce33f8e8306Be057fD7341);   // usdc whale
-        IERC20(pool2Token0).transfer(address(adapter), 1e10);
+        vm.stopPrank();
 
-        trade = adapter.swap(poolId2, pool2Token0, pool2Token1, OrderSide.Sell, 1e6);
-        assert(trade.calculatedAmount == 999916);
+        vm.prank(0x5313b39bf226ced2332C81eB97BB28c6fD50d1a3);   // wsteth whale
+        IERC20(pool1Token0).transfer(testUser, 2e15);
+
+        vm.deal(testUser, 1e18);
+        vm.startPrank(testUser);
+        bytes memory data = abi.encode(poolId1, pool1Token0, pool1Token1, true);
+
+        IERC20(pool1Token0).approve(address(executor), 2e15);
+
+        uint256 calculatedAmount = executor.swap(2e15, data);
+        assert(calculatedAmount == 2374661202000000);
+
+        data = abi.encode(poolId1, pool1Token1, pool1Token0, true);
+        calculatedAmount = executor.swap{value : 1e18}(1e18, data);
+        assert(calculatedAmount == 842056960368000000);
+        vm.stopPrank();
     }
 
     function test_getLimits() public {
@@ -100,7 +119,6 @@ contract FluidAdapterTest is AdapterTest {
         uint256[] memory amounts = new uint256[](1);
         amounts[0] = 5000000000000;
         console.log(adapter.price(bytes32(abi.encode(2)), 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48, 0xdAC17F958D2ee523a2206206994597C13D831ec7, amounts)[0].numerator);
-        // assert(adapter.price(bytes32(abi.encode(2)), 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48, 0xdAC17F958D2ee523a2206206994597C13D831ec7, amounts)[0].numerator != 0);
 
         amounts[0] = limits[0] + 1;
         assert(adapter.price(bytes32(abi.encode(2)), 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48, 0xdAC17F958D2ee523a2206206994597C13D831ec7, amounts)[0].numerator == 0);
