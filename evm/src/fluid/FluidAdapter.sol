@@ -58,34 +58,24 @@ contract FluidAdapter is ISwapAdapter {
         address buyToken,
         uint256 specifiedAmount,
         OrderSide side
-    ) internal view returns (Fraction memory price) {
+    ) internal returns (Fraction memory price) {
         address poolAddress = resolver.getPoolAddress(uint256(poolId));
         (address token0, address token1) = resolver.getPoolTokens(poolAddress);
 
         if (OrderSide.Sell == side) {
-            (bool success, bytes memory output) = address(resolver).staticcall(
-                abi.encodeWithSignature(
-                    "estimateSwapIn(address,bool,uint256,uint256)",
+            price.numerator = resolver.estimateSwapIn(
                     poolAddress,
                     sellToken == token0,
                     specifiedAmount,
                     0
-                )
-            );
-            require(success, "Swap estimation failed");
-            price.numerator = abi.decode(output, (uint256));
+                );
         } else {
-            (bool success, bytes memory output) = address(resolver).staticcall(
-                abi.encodeWithSignature(
-                    "estimateSwapOut(address,bool,uint256,uint256)",
+            price.numerator = resolver.estimateSwapOut(
                     poolAddress,
                     sellToken == token0,
                     specifiedAmount,
                     type(uint256).max
-                )
-            );
-            require(success, "Swap estimation failed");
-            price.numerator = abi.decode(output, (uint256));
+                );
         }
         price.denominator = 1;
     }
@@ -98,7 +88,6 @@ contract FluidAdapter is ISwapAdapter {
         uint256[] memory specifiedAmounts
     )
         external
-        view
         override
         checkTokens(poolId, sellToken, buyToken)
         returns (Fraction[] memory prices)
@@ -135,6 +124,8 @@ contract FluidAdapter is ISwapAdapter {
 
         (address token0,) = resolver.getPoolTokens(poolAddress);
 
+        IERC20(sellToken).approve(poolAddress, specifiedAmount);
+
         if (side == OrderSide.Sell) {
             trade.calculatedAmount = pool.swapIn(
             // trade.calculatedAmount = pool.swapIn{value: msg.value}(
@@ -157,10 +148,11 @@ contract FluidAdapter is ISwapAdapter {
         return trade;
     }
 
+    event logInner(string, uint256);
+
     /// @inheritdoc ISwapAdapter
     function getLimits(bytes32 poolId, address sellToken, address buyToken)
         external
-        view
         override
         returns (uint256[] memory limits)
     {
@@ -168,9 +160,7 @@ contract FluidAdapter is ISwapAdapter {
         address poolAddress = resolver.getPoolAddress(uint256(poolId));
         (address token0, address token1) = resolver.getPoolTokens(poolAddress);
 
-        (bool isPassed, bytes memory result) = address(resolver).staticcall(abi.encodeWithSignature("getPoolReservesAdjusted(address)", poolAddress));
-        require(isPassed, "staticcall to resolver failed!");
-        Structs.PoolWithReserves memory reserves = abi.decode(result, (Structs.PoolWithReserves));
+        Structs.PoolWithReserves memory reserves = resolver.getPoolReservesAdjusted(poolAddress);
         
         address token = token0 == sellToken ? token0 : token1;
         uint8 decimal = uint8(
@@ -292,9 +282,10 @@ contract FluidAdapter is ISwapAdapter {
         override
         returns (bytes32[] memory ids)
     {
+        require(offset + limit < resolver.getTotalPools(), "limit outside the number of pools");
         ids = new bytes32[](limit);
-        for (uint256 i = offset; i < offset + limit; i++) {
-            ids[i] = bytes32(abi.encode(i));
+        for (uint256 i; i < limit; i++) {
+            ids[i] = bytes32(abi.encode(i + offset));
         }
         return ids;
     }

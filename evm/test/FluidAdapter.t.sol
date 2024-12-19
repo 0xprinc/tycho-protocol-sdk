@@ -16,6 +16,15 @@ contract FluidAdapterTest is AdapterTest {
 
     FluidAdapter adapter;
     FluidDexReservesResolver resolver;
+    bytes32 poolId1;
+    bytes32 poolId2;
+    address pool2Token0;
+    address pool2Token1;
+    address pool1Token0;
+    address pool1Token1;
+    address pool1Address;
+    address pool2Address;
+
 
     function setUp() public {
 
@@ -28,20 +37,93 @@ contract FluidAdapterTest is AdapterTest {
         // Deploy FluidAdapter with mock resolver
         adapter = new FluidAdapter(address(resolver));
 
-        bytes32 poolId1 = bytes32(abi.encode(1)); // wstETH/Eth
-        bytes32 poolId2 = bytes32(abi.encode(2)); // USDC/USDT
+        poolId1 = bytes32(abi.encode(1)); // wstETH/Eth
+        poolId2 = bytes32(abi.encode(2)); // USDC/USDT
 
-        address pool1Address = resolver.getPoolAddress(uint256(poolId1));
-        address pool2Address = resolver.getPoolAddress(uint256(poolId2));
-        (address pool1Token0, address pool1Token1) = resolver.getPoolTokens(pool1Address);
-        (address pool2Token0, address pool2Token1) = resolver.getPoolTokens(pool2Address);
+        pool1Address = resolver.getPoolAddress(uint256(poolId1));
+        pool2Address = resolver.getPoolAddress(uint256(poolId2));
+        (pool1Token0, pool1Token1) = resolver.getPoolTokens(pool1Address);
+        (pool2Token0, pool2Token1) = resolver.getPoolTokens(pool2Address);
+        console.log();
     }
 
-    function test_price() public {}
-    function test_swap() public {}
-    function test_getLimits() public {}
-    function test_getCapabilities() public {}
-    function test_getTokens() public {}
-    function test_poolIds() public {}
+    function test_price() public {
+        uint256[] memory amounts = new uint256[](1);
+        amounts[0] = 1e6;
+        Fraction[] memory prices = adapter.price(bytes32(abi.encode(2)), 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48, 0xdAC17F958D2ee523a2206206994597C13D831ec7, amounts);
+        assert(prices[0].numerator == 999916);
+        assert(prices[0].denominator == 1);
+
+        prices = adapter.price(bytes32(abi.encode(2)), 0xdAC17F958D2ee523a2206206994597C13D831ec7, 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48, amounts);
+        assert(prices[0].numerator == 999883);
+        assert(prices[0].denominator == 1);
+
+        amounts[0] = 2e6;
+        prices = adapter.price(bytes32(abi.encode(2)), 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48, 0xdAC17F958D2ee523a2206206994597C13D831ec7, amounts);
+        assert(prices[0].numerator == 1999833);
+        assert(prices[0].denominator == 1);
+
+        prices = adapter.price(bytes32(abi.encode(2)), 0xdAC17F958D2ee523a2206206994597C13D831ec7, 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48, amounts);
+        assert(prices[0].numerator == 1999766);
+        assert(prices[0].denominator == 1);
+    }
+
+    function test_swap() public {
+        address testUser = makeAddr("testUser");
+
+
+        console.log("prince");
+
+        vm.prank(0x37305B1cD40574E4C5Ce33f8e8306Be057fD7341);   // usdc whale
+        IERC20(pool2Token0).transfer(address(adapter), 1e10);
+
+        Trade memory trade = adapter.swap(poolId2, pool2Token0, pool2Token1, OrderSide.Sell, 1e6);
+        assert(trade.calculatedAmount == 999916);
+
+    }
+
+    function test_getLimits() public {
+        uint256[] memory limits = adapter.getLimits(
+            bytes32(abi.encode(2)), 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48, 0xdAC17F958D2ee523a2206206994597C13D831ec7
+        );
+
+        uint256[] memory amounts = new uint256[](1);
+        amounts[0] = 5000000000000;
+        console.log(adapter.price(bytes32(abi.encode(2)), 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48, 0xdAC17F958D2ee523a2206206994597C13D831ec7, amounts)[0].numerator);
+        // assert(adapter.price(bytes32(abi.encode(2)), 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48, 0xdAC17F958D2ee523a2206206994597C13D831ec7, amounts)[0].numerator != 0);
+
+        amounts[0] = limits[0] + 1;
+        assert(adapter.price(bytes32(abi.encode(2)), 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48, 0xdAC17F958D2ee523a2206206994597C13D831ec7, amounts)[0].numerator == 0);
+
+        console.log(limits.length);
+        for(uint i; i < limits.length; i++){
+            console.log(limits[i]);
+        }
+    }
+
+    function test_getCapabilities(bytes32 a, address b, address c) public {
+        Capability[] memory capabilities = adapter.getCapabilities(a, b, c);
+        assert(capabilities.length == 4);
+        assert(capabilities[0] == Capability.SellOrder);
+        assert(capabilities[1] == Capability.BuyOrder);
+        assert(capabilities[2] == Capability.PriceFunction);
+        assert(capabilities[3] == Capability.HardLimits);
+    }
+
+    function test_getTokens() public {
+        address[] memory pool1Tokens = adapter.getTokens(poolId1);
+        assert(pool1Tokens[0] == pool1Token0);
+        assert(pool1Tokens[1] == pool1Token1);
+
+        address[] memory pool2Tokens = adapter.getTokens(poolId2);
+        assert(pool1Tokens[0] == pool2Token0);
+        assert(pool1Tokens[1] == pool2Token1);
+    }
+
+    function test_poolIds() public {
+        bytes32[] memory poolIds = adapter.getPoolIds(1, 5);
+        assert(poolIds.length == 5);
+        assert(poolIds[2] == bytes32(abi.encode(3)));
+    }
 
 }
