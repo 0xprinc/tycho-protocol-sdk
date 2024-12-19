@@ -63,16 +63,21 @@ contract FluidAdapterTest is AdapterTest {
         assert(prices[0].numerator == 1999833);
         assert(prices[0].denominator == 1);
 
-        prices = adapter.price(bytes32(abi.encode(2)), 0xdAC17F958D2ee523a2206206994597C13D831ec7, 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48, amounts);
-        assert(prices[0].numerator == 1999766);
+        amounts[0] = 2e15;
+        prices = adapter.price(bytes32(abi.encode(1)), 0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0, 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE, amounts);
+        assert(prices[0].numerator == 2374661202000000);
         assert(prices[0].denominator == 1);
+
+        amounts[0] = 2e15;
+        prices = adapter.price(bytes32(abi.encode(1)), 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE, 0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0, amounts);
+        assert(prices[0].numerator == 1684113940000000);
+        assert(prices[0].denominator == 1);
+
+
     }
 
     function test_swap() public {
         address testUser = makeAddr("testUser");
-
-
-        console.log("prince");
 
         vm.prank(0x37305B1cD40574E4C5Ce33f8e8306Be057fD7341);   // usdc whale
         IERC20(pool2Token0).transfer(address(adapter), 1e10);
@@ -80,6 +85,11 @@ contract FluidAdapterTest is AdapterTest {
         Trade memory trade = adapter.swap(poolId2, pool2Token0, pool2Token1, OrderSide.Sell, 1e6);
         assert(trade.calculatedAmount == 999916);
 
+        vm.prank(0x37305B1cD40574E4C5Ce33f8e8306Be057fD7341);   // usdc whale
+        IERC20(pool2Token0).transfer(address(adapter), 1e10);
+
+        trade = adapter.swap(poolId2, pool2Token0, pool2Token1, OrderSide.Sell, 1e6);
+        assert(trade.calculatedAmount == 999916);
     }
 
     function test_getLimits() public {
