@@ -1,10 +1,10 @@
 [package]
-name = "ethereum-template"
+name = "ethereum-fluid"
 version = "0.1.0"
 edition = "2021"
 
 [lib]
-name = "ethereum_template"
+name = "ethereum_fluid"
 crate-type = ["cdylib"]
 
 [dependencies]

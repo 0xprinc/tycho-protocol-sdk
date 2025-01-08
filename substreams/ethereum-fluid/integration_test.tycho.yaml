@@ -26,7 +26,7 @@ tests:
   - name: test_pool_creation
     # Indexed block range
     start_block: 123
-    stop_block: 456
+    stop_block: 200
     # Same as global `initialized_accounts` but only scoped to this test.
     initialized_accounts:
       - "0x0c0e5f2fF0ff18a3be9b835635039256dC4B4963" # Needed for ....
@@ -38,8 +38,7 @@ tests:
           - "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
           - "0x6b175474e89094c44da98b954eedeac495271d0f"
         static_attributes:
-          attr_1: "value"
-          attr_2: "value"
+          attr_1: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
         creation_tx: "0x20793bbf260912aae189d5d261ff003c9b9166da8191d8f9d63ff1c7722f3ac6"
         # Whether or not the script should skip trying to simulate a swap on this component.
         # If set to `true` please always add a reason why it's skipped.

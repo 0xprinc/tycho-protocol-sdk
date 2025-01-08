@@ -49,6 +49,7 @@ chain_name=$(echo "$package" | cut -d'-' -f1)
 yaml_files=()
 if [ -z "$2" ]; then
     # Check for YAML files in the package directory and filter by chain name
+    # yaml_files=($(ls "$package"/*.yaml 2>/dev/null | grep "substreams"))
     yaml_files=($(ls "$package"/*.yaml 2>/dev/null | grep "^$package/$chain_name"))
     if [ ${#yaml_files[@]} -eq 0 ]; then
         echo "Error: No YAML files found in the package directory that match the chain name: $chain_name."

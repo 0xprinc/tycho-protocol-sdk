@@ -108,11 +108,9 @@ class TestRunner:
                 self.config.protocol_type_names,
                 test.initialized_accounts or [],
             )
-
             result = self.tycho_runner.run_with_rpc_server(
                 self.validate_state, test.expected_components, test.stop_block
             )
-
             if result.success:
                 print(f"\n✅ {test.name} passed.\n")
             else:

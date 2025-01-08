@@ -261,6 +261,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "ethereum-fluid"
+version = "0.1.0"
+dependencies = [
+ "prost 0.11.9",
+ "substreams",
+ "substreams-ethereum",
+ "tycho-substreams",
+]
+
+[[package]]
 name = "ethereum-sfrax"
 version = "0.1.0"
 dependencies = [
@@ -295,16 +305,6 @@ dependencies = [
  "prost 0.11.9",
  "prost-types 0.11.9",
  "regex",
- "substreams",
- "substreams-ethereum",
- "tycho-substreams",
-]
-
-[[package]]
-name = "ethereum-template"
-version = "0.1.0"
-dependencies = [
- "prost 0.11.9",
  "substreams",
  "substreams-ethereum",
  "tycho-substreams",

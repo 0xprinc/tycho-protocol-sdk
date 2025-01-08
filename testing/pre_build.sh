@@ -20,7 +20,7 @@ CODEARTIFACT_AUTH_TOKEN=$(aws --region eu-central-1 codeartifact get-authorizati
 
 # Set the PIP_INDEX_URL
 PIP_INDEX_URL="https://aws:${CODEARTIFACT_AUTH_TOKEN}@propeller-${DOMAIN_OWNER}.d.codeartifact.eu-central-1.amazonaws.com/pypi/protosim/simple/"
-
+echo "https://aws:${CODEARTIFACT_AUTH_TOKEN}@propeller-${DOMAIN_OWNER}.d.codeartifact.eu-central-1.amazonaws.com/pypi/protosim/simple/"
 # Export the variables
 export CODEARTIFACT_AUTH_TOKEN
 export PIP_INDEX_URL

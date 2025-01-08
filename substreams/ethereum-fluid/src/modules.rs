@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+// use std::collections::HashMap;
 use substreams_ethereum::pb::eth;
 use tycho_substreams::prelude::*;
 
@@ -6,7 +6,8 @@ use tycho_substreams::prelude::*;
 fn map_protocol_changes(
     block: eth::v2::Block,
 ) -> Result<BlockContractChanges, substreams::errors::Error> {
-    let mut transaction_contract_changes = Vec::<TransactionContractChanges>::new();
+    let transaction_contract_changes = Vec::<TransactionContractChanges>::new();
+    // let mut transaction_contract_changes = Vec::<TransactionContractChanges>::new();
     // TODO: protocol specific logic goes here
     Ok(BlockContractChanges { block: Some((&block).into()), changes: transaction_contract_changes })
 }
