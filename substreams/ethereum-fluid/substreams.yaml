@@ -1,7 +1,7 @@
 specVersion: v0.1.0
 package:
   name: "ethereum_fluid"
-  version: v0.1.0
+  version: "v0.1.0"
 
 protobuf:
   files:
@@ -18,10 +18,16 @@ binaries:
 
 modules:
   - name: map_dex_deployed
-    handler: "map_dex_deployed"
-    params:
-      factory_address: ""
-      protocol_type_name: "FluidDex"
+    type: map
+    proto_path: "./src/modules/map_dex_deployed.proto"  # Ensure this path is correct
+    functions:
+      - function: "map_dex_deployed"
+        params:
+          factory_address: "0x91716C4EDA1Fb55e84Bf8b4c7085f84285c19085"
+          protocol_type_name: "FluidDex"
   
   - name: store_dexes
-    handler: "store_dexes"
+    type: store
+    proto_path: "./src/modules/store_dexes.proto"  # Ensure this path is correct
+    functions:
+      - function: "store_dexes"

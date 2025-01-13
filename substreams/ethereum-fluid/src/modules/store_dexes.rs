@@ -1,6 +1,6 @@
 use substreams::store::{StoreNew, StoreSetIfNotExists, StoreSetIfNotExistsProto};
 
-use crate::store_key::StoreKey;
+use crate::store_key;
 use tycho_substreams::prelude::*;
 
 #[substreams::handlers::store]
@@ -15,7 +15,7 @@ pub fn store_dexes(
             // Use ordinal 0 because the address should be unique, so ordering doesn't matter.
             store.set_if_not_exists(
                 0,
-                StoreKey::Dex.get_unique_dex_key(&new_protocol_component.id),
+                store_key::StoreKey::Dex.get_unique_dex_key(&new_protocol_component.id),
                 &new_protocol_component,
             );
         }
