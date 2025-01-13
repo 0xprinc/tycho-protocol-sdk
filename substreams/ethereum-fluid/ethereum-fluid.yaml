@@ -17,9 +17,11 @@ binaries:
     file: ../target/wasm32-unknown-unknown/release/ethereum_fluid.wasm
 
 modules:
-  - name: map_protocol_changes
-    kind: map
-    inputs:
-      - source: sf.ethereum.type.v2.Block
-    output:
-      type: proto:tycho.evm.state.v1.BlockContractChanges
+  - name: map_dex_deployed
+    handler: "map_dex_deployed"
+    params:
+      factory_address: "0xYourFactoryAddress"
+      protocol_type_name: "FluidDex"
+  
+  - name: store_dexes
+    handler: "store_dexes"
