@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+package tycho.evm.fluid.v1;
+
+message Pools {
+  repeated Pool pools = 1;
+}
+
+message Pool {
+
+  bytes dexId = 1;
+  bytes address = 2;
+
+  bytes created_tx_hash = 4;
+}
+
+message Events {
+  repeated Event events = 1;
+}
+
+message Event {
+  oneof type {
+    DepositEvent deposit = 10;
+  }
+
+  string hash = 100;
+  uint32 log_index = 101;
+  uint64 log_ordinal = 102;
+  string to = 103;
+  string from = 104;
+  uint64 block_number = 105;
+  uint64 timestamp = 106;
+  string pool = 107;
+}
+
+message DepositEvent {
+  repeated string dex = 1;
+  repeated uint output_token_amount = 2;
+}
