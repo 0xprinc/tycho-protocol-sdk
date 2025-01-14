@@ -20,7 +20,6 @@ def main() -> None:
         "--vm-traces", action="store_true", help="Enable tracing during vm simulations."
     )
     args = parser.parse_args()
-
     test_runner = TestRunner(
         args.package, args.tycho_logs, db_url=args.db_url, vm_traces=args.vm_traces
     )

@@ -5,3 +5,7 @@ pub use store_dexes::store_dexes;
 mod map_dex_deployed;
 #[path = "store_dexes.rs"]
 mod store_dexes;
+#[path = "map_dex_components.rs"]
+mod map_dex_components;
+#[path = "store_dex_components.rs"]
+mod store_dex_components;
