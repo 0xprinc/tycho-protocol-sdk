@@ -9,3 +9,6 @@ mod store_pools;
 
 #[path = "3_map_pool_events.rs"]
 mod map_pool_events;
+
+#[path = 4_store_pool_events.rs"]
+mod store_pool_events;
