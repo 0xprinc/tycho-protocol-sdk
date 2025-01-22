@@ -14,5 +14,9 @@ fn main() -> Result<(), anyhow::Error> {
         .generate()?
         .write_to_file("src/abi/storageRead.rs")?;
 
+    Abigen::new("Factory", "abi/factory.json")?
+        .generate()?
+        .write_to_file("src/abi/factory.rs")?;
+
     Ok(())
 }
