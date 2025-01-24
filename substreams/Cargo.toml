@@ -9,7 +9,8 @@ members = [
     "ethereum-uniswap-v3",
     "ethereum-sfrax",
     "ethereum-sfraxeth",
-    "ethereum-uniswap-v3-logs-only",
+    "ethereum-uniswap-v3-logs-only", 
+    "ethereum-fluid",
 ]
 resolver = "2"
 

@@ -1,0 +1,28 @@
+[package]
+name = "ethereum-fluid"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "ethereum_fluid"
+crate-type = ["cdylib"]
+
+[dependencies]
+substreams.workspace = true
+substreams-ethereum.workspace = true
+prost.workspace = true
+ethabi.workspace = true
+anyhow = { workspace = true, features = [] }
+hex-literal.workspace = true
+substreams-helper.workspace = true
+tycho-substreams.workspace = true
+num-bigint = "0.4.4"
+itertools = "0.12.1"
+serde_qs = "0.13.0"
+serde.workspace = true
+sha2 = "0.10.8"
+hex = "0.4"
+
+[build-dependencies]
+anyhow.workspace = true
+substreams-ethereum.workspace = true
