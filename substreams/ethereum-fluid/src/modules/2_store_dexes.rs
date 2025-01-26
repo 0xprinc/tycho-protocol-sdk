@@ -9,7 +9,6 @@ pub fn store_dexes(
     store: StoreSetIfNotExistsProto<ProtocolComponent>,
 ) {
     // Store dexes. Required so the next steps can match any event to a known dex by their address
-
     for change in dexes_deployed.changes {
         for new_protocol_component in change.component_changes {
             // Use ordinal 0 because the address should be unique, so ordering doesn't matter.

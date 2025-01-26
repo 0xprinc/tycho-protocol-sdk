@@ -1,0 +1,138 @@
+syntax = "proto3";
+
+package tycho.evm.fluid.v1;
+
+// Represents a list of pools
+message Pools {
+  repeated Pool pools = 1;
+}
+
+// Represents a pool reserve
+message PoolReserve {
+    string pool = 1;
+    string token0 = 2;
+    string token1 = 3;
+    uint32 fee = 4; // Fee as integer
+    double center_price = 5; // Center price as float
+    CollateralReserves collateral_reserves = 6;
+    DebtReserves debt_reserves = 7;
+    DexLimits dex_limits = 8;
+    bytes created_tx_hash = 9; // Added semicolon
+}
+
+// Represents a response with pool reserve data
+message PoolReserveResponse {
+    string pool = 1;
+    string token0 = 2;
+    string token1 = 3;
+    string big_number_1 = 4; // BigNumber stored as string
+    string big_number_2 = 5; // BigNumber stored as string
+    repeated string big_number_array_1 = 6; // Array of BigNumbers
+    repeated string big_number_array_2 = 7; // Array of BigNumbers
+    DexLimitResponse dex_limit_response = 8;
+}
+
+// Represents the DEX limits for tokens
+message DexLimits {
+    TokenLimit withdrawable_token0 = 1;
+    TokenLimit withdrawable_token1 = 2;
+    TokenLimit borrowable_token0 = 3;
+    TokenLimit borrowable_token1 = 4;
+}
+
+// Represents a response with DEX limits
+message DexLimitResponse {
+    TokenLimitResponse withdrawable_token0 = 1;
+    TokenLimitResponse withdrawable_token1 = 2;
+    TokenLimitResponse borrowable_token0 = 3;
+    TokenLimitResponse borrowable_token1 = 4;
+}
+
+// Represents token limits
+message TokenLimit {
+    uint64 available = 1;
+    uint64 expands_to = 2;
+    uint64 expands_duration = 3;
+}
+
+// Represents token limit responses
+message TokenLimitResponse {
+    uint64 available = 1;
+    uint64 expands_to = 2;
+    uint64 expands_duration = 3;
+}
+
+// Represents collateral reserves
+message CollateralReserves {
+    uint64 token0_real_reserves = 1;
+    uint64 token1_real_reserves = 2;
+    uint64 token0_imaginary_reserves = 3;
+    uint64 token1_imaginary_reserves = 4;
+}
+
+// Represents debt reserves
+message DebtReserves {
+    uint64 token0_debt = 1;
+    uint64 token1_debt = 2;
+    uint64 token0_real_reserves = 3;
+    uint64 token1_real_reserves = 4;
+    uint64 token0_imaginary_reserves = 5;
+    uint64 token1_imaginary_reserves = 6;
+}
+
+// Represents a pool with reserves
+message PoolWithReserves {
+    string pool = 1;
+    string token0 = 2;
+    string token1 = 3;
+    uint32 fee = 4; // Fee as integer
+    double center_price = 5; // Center price as float
+    CollateralReserves collateral_reserves = 6;
+    DebtReserves debt_reserves = 7;
+}
+
+// Represents fluid DEX data
+message FluidDexData {
+    string pool_id = 1;
+}
+
+// Represents a pool in the DEX
+message FluidDexPool {
+    string id = 1;
+    string address = 2;
+    string token0 = 3;
+    string token1 = 4;
+}
+
+// Represents a pool with its address and tokens
+message Pool {
+    string address = 1;
+    string token0 = 2;
+    string token1 = 3;
+}
+
+// Represents a list of events
+message Events {
+  repeated Event events = 1;
+}
+
+// Represents a single event
+message Event {
+  oneof type {
+    LogDexDeployed deploy = 10; // Event type
+  }
+  string hash = 100;
+  uint32 log_index = 101;
+  uint64 log_ordinal = 102;
+  string to = 103;
+  string from = 104;
+  uint64 block_number = 105;
+  uint64 timestamp = 106;
+  string pool = 107;
+}
+
+// Represents a LogDexDeployed event
+message LogDexDeployed {
+  repeated string dex_address = 1;
+  repeated uint64 dex_id = 2; // Corrected uint type
+}

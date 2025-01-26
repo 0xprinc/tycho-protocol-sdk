@@ -14,9 +14,9 @@ impl StoreKey {
         hex::encode(hash)
     }
 
-    pub fn unique_id(&self) -> String {
-        match self {
-            StoreKey::Dex => "Dex".to_string(),
-        }
-    }
+    // pub fn unique_id(&self) -> String {
+    //     match self {
+    //         StoreKey::Dex => "Dex".to_string(),
+    //     }
+    // }
 }
